@@ -53,6 +53,10 @@ class ADKSwarmService:
             'neighbors': self.orchestrator.network_topology.get(agent.village_id, []),
             'adk_agent_status': 'active'
         }
+    
+    async def trigger_outbreak_detection_workflow(self, village_id: str) -> Dict:
+        """Trigger outbreak detection workflow"""
+        return await self.orchestrator.trigger_outbreak_detection_workflow(village_id)
 
 # Singleton instance - will be created with quantum service in main.py
 adk_swarm_service = None
