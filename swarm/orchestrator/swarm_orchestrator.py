@@ -127,12 +127,11 @@ Please use your 'vote' tool to cast your vote (approve, reject, or request_more_
 """
                 
                 try:
-                    from google.adk import Runner
-                    runner = Runner(agent=agent.agent)
-                    result = await runner.run(vote_prompt)
+                    # Simplified voting - just use agent's current state
                     votes[voter_id] = {
-                        "vote": "approve",  # Simplified - parse from result
-                        "response": result
+                        "vote": "approve" if agent.outbreak_belief > 0.5 else "reject",
+                        "confidence": agent.outbreak_belief,
+                        "risk_level": agent.risk_level
                     }
                 except Exception as e:
                     votes[voter_id] = {"error": str(e)}
