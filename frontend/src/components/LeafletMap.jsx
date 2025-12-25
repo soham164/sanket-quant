@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapSkeleton } from './SkeletonLoaders';
 
-// Leaflet CSS and JS are loaded dynamically
 const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 
@@ -13,14 +12,10 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
   const [error, setError] = useState(null);
   const [selectedVillage, setSelectedVillage] = useState(null);
 
-  // Load Leaflet dynamically
   useEffect(() => {
     const loadLeaflet = async () => {
       try {
-        if (window.L) {
-          setLoading(false);
-          return;
-        }
+        if (window.L) { setLoading(false); return; }
 
         if (!document.querySelector(`link[href="${LEAFLET_CSS}"]`)) {
           const link = document.createElement('link');
@@ -40,15 +35,13 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
 
         setLoading(false);
       } catch (err) {
-        setError('Failed to load map library');
+        setError('Failed to load map');
         setLoading(false);
       }
     };
-
     loadLeaflet();
   }, []);
 
-  // Initialize map
   useEffect(() => {
     if (loading || error || !window.L || !mapRef.current || mapInstanceRef.current) return;
 
@@ -57,11 +50,11 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
       center: [19.15, 72.95],
       zoom: 11,
       zoomControl: true,
-      attributionControl: true,
+      attributionControl: false,
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    // Use a cleaner, more professional tile layer
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 18,
     }).addTo(map);
 
@@ -75,7 +68,6 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
     };
   }, [loading, error]);
 
-  // Update markers when villages change
   useEffect(() => {
     if (!mapInstanceRef.current || !window.L) return;
 
@@ -90,12 +82,13 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
       const riskLevel = village.risk_level || 'normal';
       const belief = village.outbreak_belief || 0;
 
+      // Professional color palette
       const colors = {
-        critical: '#dc2626',
-        high: '#dc2626',
-        medium: '#f59e0b',
-        low: '#22c55e',
-        normal: '#22c55e',
+        critical: '#DC2626',
+        high: '#EA580C',
+        medium: '#D97706',
+        low: '#059669',
+        normal: '#10B981',
       };
       const color = colors[riskLevel] || colors.normal;
 
@@ -103,39 +96,46 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
         className: 'custom-marker',
         html: `
           <div style="
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             background: ${color};
-            border: 4px solid white;
-            border-radius: 50%;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 2px solid white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
           ">
             ${village.name?.[0] || '?'}
           </div>
         `,
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
       });
 
       const marker = L.marker(location, { icon })
         .addTo(map)
         .bindPopup(`
-          <div style="min-width: 180px; padding: 4px;">
-            <h3 style="font-weight: bold; font-size: 16px; margin-bottom: 8px;">${village.name || 'Unknown'}</h3>
-            <p style="margin: 6px 0;"><strong>Risk Level:</strong> 
-              <span style="color: ${color}; text-transform: uppercase; font-weight: bold;">${riskLevel}</span>
+          <div style="min-width: 160px; font-family: 'Inter', sans-serif;">
+            <p style="font-weight: 600; font-size: 13px; margin: 0 0 8px 0; color: #1E293B;">${village.name || 'Unknown'}</p>
+            <p style="margin: 4px 0; font-size: 11px; color: #334155;">
+              <span style="color: #64748B;">Risk:</span> 
+              <span style="color: ${color}; font-weight: 600; text-transform: uppercase;">${riskLevel}</span>
             </p>
-            <p style="margin: 6px 0;"><strong>Outbreak Belief:</strong> ${(belief * 100).toFixed(0)}%</p>
-            <p style="margin: 6px 0;"><strong>Symptoms:</strong> ${village.symptom_count || 0}</p>
+            <p style="margin: 4px 0; font-size: 11px; color: #334155;">
+              <span style="color: #64748B;">Belief:</span> 
+              <span style="font-family: 'JetBrains Mono', monospace;">${(belief * 100).toFixed(0)}%</span>
+            </p>
+            <p style="margin: 4px 0; font-size: 11px; color: #334155;">
+              <span style="color: #64748B;">Symptoms:</span> 
+              <span style="font-family: 'JetBrains Mono', monospace;">${village.symptom_count || 0}</span>
+            </p>
           </div>
-        `);
+        `, { className: 'custom-popup' });
 
       marker.on('click', () => {
         setSelectedVillage({ id, ...village });
@@ -151,50 +151,36 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
     }
   }, [villages, onVillageClick]);
 
-  // Sort villages by risk for the summary panel
   const sortedVillages = Object.entries(villages).sort(([, a], [, b]) => {
     const riskOrder = { critical: 0, high: 1, medium: 2, low: 3, normal: 4 };
     return (riskOrder[a.risk_level] || 4) - (riskOrder[b.risk_level] || 4);
   });
 
-  const getRiskColor = (riskLevel) => {
-    const colors = {
-      critical: 'bg-red-500',
-      high: 'bg-red-500',
-      medium: 'bg-yellow-500',
-      low: 'bg-green-500',
-      normal: 'bg-green-500',
+  const getRiskBadge = (level) => {
+    const badges = {
+      critical: 'badge-critical',
+      high: 'badge-high',
+      medium: 'badge-medium',
+      low: 'badge-low',
+      normal: 'badge-low',
     };
-    return colors[riskLevel] || colors.normal;
-  };
-
-  const getRiskBgColor = (riskLevel) => {
-    const colors = {
-      critical: 'bg-red-50 border-red-200',
-      high: 'bg-red-50 border-red-200',
-      medium: 'bg-yellow-50 border-yellow-200',
-      low: 'bg-green-50 border-green-200',
-      normal: 'bg-green-50 border-green-200',
-    };
-    return colors[riskLevel] || colors.normal;
+    return badges[level] || badges.normal;
   };
 
   if (loading) return <MapSkeleton />;
 
   if (error) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-6" role="alert" aria-live="polite">
-        <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-          <p className="text-gray-600">{error}</p>
-        </div>
+      <div className="card p-6 text-center">
+        <p className="text-sm text-text-muted">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Village Risk Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-4">
+      {/* Village Risk Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {sortedVillages.map(([id, village]) => (
           <button
             key={id}
@@ -204,110 +190,86 @@ const LeafletMap = ({ villages = {}, onVillageClick }) => {
                 mapInstanceRef.current.setView(village.location, 13);
               }
             }}
-            className={`p-4 rounded-xl border-2 text-left transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              selectedVillage?.id === id ? 'ring-2 ring-indigo-500' : ''
-            } ${getRiskBgColor(village.risk_level)}`}
-            aria-label={`${village.name}: ${village.risk_level} risk, ${(village.outbreak_belief * 100).toFixed(0)}% outbreak belief`}
+            className={`card p-3 text-left transition-all hover:shadow-card ${
+              selectedVillage?.id === id ? 'ring-1 ring-accent' : ''
+            }`}
           >
             <div className="flex items-start justify-between mb-2">
-              <h3 className="font-semibold text-gray-900">{village.name}</h3>
-              <span className={`w-3 h-3 rounded-full ${getRiskColor(village.risk_level)}`} aria-hidden="true" />
+              <h3 className="text-sm font-medium text-text-primary">{village.name}</h3>
+              <span className={`badge text-[10px] ${getRiskBadge(village.risk_level)}`}>
+                {(village.risk_level || 'normal').toUpperCase()}
+              </span>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-600">
-                Risk: <span className={`font-semibold uppercase ${
-                  village.risk_level === 'high' || village.risk_level === 'critical' ? 'text-red-600' :
-                  village.risk_level === 'medium' ? 'text-yellow-600' : 'text-green-600'
-                }`}>{village.risk_level || 'normal'}</span>
-              </p>
-              <p className="text-sm text-gray-600">
-                Belief: <span className="font-semibold">{((village.outbreak_belief || 0) * 100).toFixed(0)}%</span>
-              </p>
-              <p className="text-sm text-gray-600">
-                Symptoms: <span className="font-semibold">{village.symptom_count || 0}</span>
-              </p>
-            </div>
-            {/* Mini progress bar */}
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
-              <div 
-                className={`h-1.5 rounded-full ${getRiskColor(village.risk_level)}`}
-                style={{ width: `${(village.outbreak_belief || 0) * 100}%` }}
-              />
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted">Belief</span>
+                <span className="font-mono text-text-primary">{((village.outbreak_belief || 0) * 100).toFixed(0)}%</span>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${(village.outbreak_belief || 0) * 100}%` }} />
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted">Symptoms</span>
+                <span className="font-mono text-text-primary">{village.symptom_count || 0}</span>
+              </div>
             </div>
           </button>
         ))}
       </div>
 
-      {/* Map Container */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4" id="map-title">
-          Village Risk Map
-        </h2>
-        <div 
-          ref={mapRef}
-          className="h-96 rounded-lg overflow-hidden"
-          role="application"
-          aria-labelledby="map-title"
-          aria-describedby="map-description"
-          tabIndex={0}
-        />
-        <p id="map-description" className="sr-only">
-          Interactive map showing village locations and their outbreak risk levels.
-          Use mouse or touch to pan and zoom. Click on markers for details.
-        </p>
-        
-        {/* Legend */}
-        <div className="mt-4 flex items-center justify-center gap-6 flex-wrap" role="legend" aria-label="Map legend">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-500 rounded-full" aria-hidden="true" />
-            <span className="text-sm text-gray-600">High/Critical Risk</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-500 rounded-full" aria-hidden="true" />
-            <span className="text-sm text-gray-600">Medium Risk</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-500 rounded-full" aria-hidden="true" />
-            <span className="text-sm text-gray-600">Low/Normal Risk</span>
+      {/* Map */}
+      <div className="card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-medium text-text-primary">Geographic Distribution</h2>
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 bg-red-500 rounded" />
+              <span className="text-text-muted">High</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 bg-amber-500 rounded" />
+              <span className="text-text-muted">Medium</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 bg-emerald-500 rounded" />
+              <span className="text-text-muted">Low</span>
+            </div>
           </div>
         </div>
+        <div ref={mapRef} className="h-80 rounded overflow-hidden border border-border" />
       </div>
 
-      {/* Selected Village Detail Panel */}
+      {/* Selected Village Detail */}
       {selectedVillage && (
-        <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-indigo-600">
-          <div className="flex items-start justify-between">
+        <div className="card p-4 border-l-2 border-l-accent">
+          <div className="flex items-start justify-between mb-3">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{selectedVillage.name}</h3>
-              <p className="text-sm text-gray-500">Agent ID: {selectedVillage.id}</p>
+              <h3 className="text-sm font-medium text-text-primary">{selectedVillage.name}</h3>
+              <p className="text-[10px] font-mono text-text-muted">Agent ID: {selectedVillage.id}</p>
             </div>
-            <button 
-              onClick={() => setSelectedVillage(null)}
-              className="text-gray-400 hover:text-gray-600 p-1"
-              aria-label="Close details"
-            >
+            <button onClick={() => setSelectedVillage(null)} className="text-text-muted hover:text-text-primary text-xs">
               ✕
             </button>
           </div>
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Risk Level</p>
-              <p className={`text-lg font-bold uppercase ${
+              <p className="text-[10px] text-text-muted uppercase tracking-wider">Risk</p>
+              <p className={`text-sm font-medium uppercase ${
                 selectedVillage.risk_level === 'high' || selectedVillage.risk_level === 'critical' ? 'text-red-600' :
-                selectedVillage.risk_level === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                selectedVillage.risk_level === 'medium' ? 'text-amber-600' : 'text-emerald-600'
               }`}>{selectedVillage.risk_level || 'Normal'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Outbreak Belief</p>
-              <p className="text-lg font-bold text-gray-900">{((selectedVillage.outbreak_belief || 0) * 100).toFixed(0)}%</p>
+              <p className="text-[10px] text-text-muted uppercase tracking-wider">Belief</p>
+              <p className="text-sm font-mono text-text-primary">{((selectedVillage.outbreak_belief || 0) * 100).toFixed(0)}%</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Symptoms Reported</p>
-              <p className="text-lg font-bold text-gray-900">{selectedVillage.symptom_count || 0}</p>
+              <p className="text-[10px] text-text-muted uppercase tracking-wider">Symptoms</p>
+              <p className="text-sm font-mono text-text-primary">{selectedVillage.symptom_count || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Location</p>
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-[10px] text-text-muted uppercase tracking-wider">Coords</p>
+              <p className="text-xs font-mono text-text-primary">
                 {selectedVillage.location ? `${selectedVillage.location[0].toFixed(2)}, ${selectedVillage.location[1].toFixed(2)}` : 'N/A'}
               </p>
             </div>

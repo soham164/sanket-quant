@@ -1,17 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Base styles */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-surface text-text-primary font-sans;
+    margin: 0;
+  }
+
+  /* Remove default focus outlines, add custom */
+  *:focus {
+    @apply outline-none;
+  }
+
+  *:focus-visible {
+    @apply ring-2 ring-accent ring-offset-1;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Component styles */
+@layer components {
+  /* Professional card style - subtle border instead of heavy shadow */
+  .card {
+    @apply bg-white border border-border rounded-md;
+  }
+
+  .card-elevated {
+    @apply bg-white border border-border rounded-md shadow-card;
+  }
+
+  /* Quantum network background pattern */
+  .quantum-bg {
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
+      linear-gradient(90deg, transparent 49.5%, rgba(6, 182, 212, 0.05) 49.5%, rgba(6, 182, 212, 0.05) 50.5%, transparent 50.5%),
+      linear-gradient(0deg, transparent 49.5%, rgba(6, 182, 212, 0.05) 49.5%, rgba(6, 182, 212, 0.05) 50.5%, transparent 50.5%);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  }
+
+  /* Subtle network lines for headers */
+  .network-lines {
+    position: relative;
+  }
+
+  .network-lines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%2306B6D4' stroke-width='0.5' stroke-opacity='0.08'%3E%3Cpath d='M30 0v60M0 30h60M10 10l40 40M50 10L10 50'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='10' cy='10' r='1'/%3E%3Ccircle cx='50' cy='10' r='1'/%3E%3Ccircle cx='10' cy='50' r='1'/%3E%3Ccircle cx='50' cy='50' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* Professional button styles */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors;
+    @apply focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-1;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-text-inverse hover:bg-primary-100;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-white hover:bg-accent-600;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-text-secondary hover:bg-surface-200;
+  }
+
+  .btn-outline {
+    @apply bg-transparent border border-border text-text-secondary hover:bg-surface-200;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-3 py-2 text-sm bg-white border border-border rounded;
+    @apply placeholder:text-text-muted;
+    @apply focus:border-accent focus:ring-1 focus:ring-accent;
+  }
+
+  /* Badge/Tag styles */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded;
+  }
+
+  .badge-critical {
+    @apply bg-red-50 text-red-700 border border-red-200;
+  }
+
+  .badge-high {
+    @apply bg-orange-50 text-orange-700 border border-orange-200;
+  }
+
+  .badge-medium {
+    @apply bg-amber-50 text-amber-700 border border-amber-200;
+  }
+
+  .badge-low {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+  }
+
+  .badge-accent {
+    @apply bg-accent-50 text-accent-700 border border-accent-200;
+  }
+
+  /* Monospace technical labels */
+  .tech-label {
+    @apply font-mono text-xs text-text-muted tracking-wide;
+  }
+
+  .tech-value {
+    @apply font-mono text-sm text-text-primary;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    @apply h-1 bg-surface-300 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-accent transition-all duration-300;
+  }
+
+  /* Stat card */
+  .stat-card {
+    @apply card p-4;
+  }
+
+  .stat-label {
+    @apply text-xs font-medium text-text-muted uppercase tracking-wider;
+  }
+
+  .stat-value {
+    @apply text-2xl font-semibold text-text-primary mt-1;
+  }
+
+  /* Navigation */
+  .nav-item {
+    @apply px-3 py-2 text-sm font-medium text-text-secondary rounded;
+    @apply hover:bg-surface-200 hover:text-text-primary;
+    @apply transition-colors;
+  }
+
+  .nav-item-active {
+    @apply bg-surface-200 text-text-primary;
+  }
+
+  /* Table styles */
+  .table-header {
+    @apply text-xs font-medium text-text-muted uppercase tracking-wider;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-sm text-text-secondary border-b border-border;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Subtle pulse animation for live indicators */
+  .pulse-subtle {
+    animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* Quantum glow effect */
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface-200;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-text-muted;
+}
+
+/* Code/Technical text */
+code, .code {
+  @apply font-mono text-sm bg-surface-200 px-1.5 py-0.5 rounded text-text-primary;
 }

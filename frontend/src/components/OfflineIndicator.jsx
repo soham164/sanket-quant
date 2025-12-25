@@ -9,36 +9,25 @@ const OfflineIndicator = () => {
   return (
     <div 
       className={`fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-auto z-50 ${
-        isOnline ? 'bg-yellow-500' : 'bg-red-500'
-      } text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3`}
-      role="status"
-      aria-live="polite"
+        isOnline ? 'bg-amber-600' : 'bg-red-600'
+      } text-white px-4 py-2.5 rounded shadow-lg flex items-center gap-3`}
     >
       {!isOnline ? (
         <>
-          <WifiOff className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
+          <WifiOff className="w-4 h-4 flex-shrink-0" />
           <div>
-            <p className="font-medium">You're offline</p>
-            <p className="text-sm opacity-90">
-              {queueLength > 0 
-                ? `${queueLength} report${queueLength > 1 ? 's' : ''} queued for sync`
-                : 'Reports will be saved locally'}
+            <p className="text-sm font-medium">Offline</p>
+            <p className="text-xs opacity-80">
+              {queueLength > 0 ? `${queueLength} report${queueLength > 1 ? 's' : ''} queued` : 'Reports saved locally'}
             </p>
           </div>
         </>
       ) : (
         <>
-          <RefreshCw 
-            className={`w-5 h-5 flex-shrink-0 ${syncing ? 'animate-spin' : ''}`} 
-            aria-hidden="true" 
-          />
+          <RefreshCw className={`w-4 h-4 flex-shrink-0 ${syncing ? 'animate-spin' : ''}`} />
           <div>
-            <p className="font-medium">
-              {syncing ? 'Syncing...' : 'Pending sync'}
-            </p>
-            <p className="text-sm opacity-90">
-              {queueLength} report{queueLength > 1 ? 's' : ''} waiting to upload
-            </p>
+            <p className="text-sm font-medium">{syncing ? 'Syncing...' : 'Pending'}</p>
+            <p className="text-xs opacity-80">{queueLength} report{queueLength > 1 ? 's' : ''} waiting</p>
           </div>
         </>
       )}

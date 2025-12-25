@@ -13,7 +13,7 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({ errorInfo });
-    console.error('ErrorBoundary caught:', error, errorInfo);
+    console.error('ErrorBoundary:', error, errorInfo);
   }
 
   handleRetry = () => {
@@ -23,36 +23,27 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div 
-          className="min-h-screen bg-gray-50 flex items-center justify-center p-4"
-          role="alert"
-          aria-live="assertive"
-        >
-          <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full mx-auto flex items-center justify-center mb-4">
-              <AlertTriangle className="w-8 h-8 text-red-600" aria-hidden="true" />
+        <div className="min-h-screen bg-surface flex items-center justify-center p-4">
+          <div className="max-w-md w-full card p-6 text-center">
+            <div className="w-12 h-12 bg-red-50 rounded mx-auto flex items-center justify-center mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-            <p className="text-gray-600 mb-6">
-              {this.props.fallbackMessage || "We're sorry, but something unexpected happened. Please try again."}
+            <h1 className="text-lg font-semibold text-text-primary mb-2">Something went wrong</h1>
+            <p className="text-sm text-text-muted mb-4">
+              An unexpected error occurred. Please try again.
             </p>
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mb-4 text-left bg-gray-100 rounded-lg p-4">
-                <summary className="cursor-pointer text-sm font-medium text-gray-700">
+              <details className="mb-4 text-left bg-surface-200 rounded p-3">
+                <summary className="cursor-pointer text-xs font-medium text-text-secondary">
                   Error Details
                 </summary>
-                <pre className="mt-2 text-xs text-red-600 overflow-auto">
+                <pre className="mt-2 text-[10px] font-mono text-red-600 overflow-auto">
                   {this.state.error.toString()}
-                  {this.state.errorInfo?.componentStack}
                 </pre>
               </details>
             )}
-            <button
-              onClick={this.handleRetry}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
-              aria-label="Try again"
-            >
-              <RefreshCw className="w-4 h-4" aria-hidden="true" />
+            <button onClick={this.handleRetry} className="btn btn-primary">
+              <RefreshCw className="w-4 h-4" />
               Try Again
             </button>
           </div>
