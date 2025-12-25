@@ -1,0 +1,31 @@
+{
+  "name": "Sanket - Epidemiology Network",
+  "short_name": "Sanket",
+  "description": "Quantum-Enhanced Epidemiology Network for disease outbreak detection",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#4f46e5",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "New Report",
+      "short_name": "Report",
+      "description": "Submit a new symptom report",
+      "url": "/?view=report",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

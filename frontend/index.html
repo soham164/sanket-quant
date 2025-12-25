@@ -2,11 +2,59 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="description" content="Sanket - Quantum-Enhanced Epidemiology Network for AI-powered disease outbreak detection" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Sanket" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
+    
     <title>Sanket - Quantum-Enhanced Epidemiology Network</title>
+    
+    <!-- Accessibility: Skip to main content link styles -->
+    <style>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: #4f46e5;
+        color: white;
+        padding: 8px 16px;
+        z-index: 100;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .skip-link:focus {
+        top: 0;
+      }
+    </style>
   </head>
   <body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#root" class="skip-link">Skip to main content</a>
+    
     <div id="root"></div>
+    
+    <noscript>
+      <div style="padding: 2rem; text-align: center; font-family: system-ui, sans-serif;">
+        <h1>JavaScript Required</h1>
+        <p>Sanket requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
+    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
